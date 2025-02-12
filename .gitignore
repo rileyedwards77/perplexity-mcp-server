@@ -1,2 +1,4 @@
 memory-bank/
 .clirules
+node_modules/
+build/
