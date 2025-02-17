@@ -1,5 +1,7 @@
 # Perplexity AI MCP Server
 
+[![smithery badge](https://smithery.ai/badge/@rileyedwards77/perplexity-mcp-server)](https://smithery.ai/server/@rileyedwards77/perplexity-mcp-server)
+
 This repository contains the source code for a Model Context Protocol (MCP) server that provides access to the Perplexity AI API.  This server allows users to interact with Perplexity AI through various tools, including chatting, searching, and retrieving documentation.
 
 ## Purpose
@@ -8,6 +10,15 @@ This server simplifies the integration of Perplexity AI into MCP-based systems. 
 
 ## Setup
 
+### Installing via Smithery
+
+To install Perplexity AI Server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@rileyedwards77/perplexity-mcp-server):
+
+```bash
+npx -y @smithery/cli install @rileyedwards77/perplexity-mcp-server --client claude
+```
+
+### Manual Installation
 1.  **Install Node.js and npm:** Ensure you have Node.js and npm installed on your system.
 2.  **Clone the repository:** Clone this repository to your local machine.
 3.  **Install dependencies:** Navigate to the project directory and run `npm install`.
