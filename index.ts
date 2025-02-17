@@ -227,7 +227,7 @@ class PerplexityServer {
 
             // Call Perplexity API
             const response = await this.axiosInstance.post("/chat/completions", {
-              model: "sonar-reasoning-pro",
+              model: "sonar-medium-online",
               messages,
             });
 
@@ -261,9 +261,9 @@ class PerplexityServer {
                 query: string;
                 context?: string;
               };
-            const response = await this.axiosInstance.get(
-              `/search?q=documentation ${query} ${context}`
-            );
+            const response = await this.axiosInstance.post('/search', {
+              query: `documentation ${query} ${context}`
+            });
             return {
               content: [
                 {
@@ -280,9 +280,41 @@ class PerplexityServer {
                 query: string;
                 detail_level?: string;
               };
-            const response = await this.axiosInstance.get(
-              `/search?q=${query}&details=${detail_level}`
-            );
+
+            // Map detail level to model
+            const model = detail_level === "detailed" ? "sonar-reasoning-pro" :  // Most expensive, best reasoning
+                        detail_level === "brief" ? "sonar" :                     // Basic, cheapest at $1/$1
+                        "sonar-reasoning";                                       // Middle ground at $1/$5
+            
+            // System prompt optimized for Claude
+            const systemPrompt = `You are providing search results to Claude, an AI assistant.
+            Skip unnecessary explanations - Claude can interpret and explain the data itself.`;
+            
+            // Call Perplexity API
+            // Note: max_tokens could be increased for detailed responses, but consider cost implications
+            // sonar-reasoning-pro can use >1000 tokens and does multiple searches
+            console.error('Sending request:', JSON.stringify({
+              model,
+              messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: query }
+              ],
+              max_tokens: 1000,
+              temperature: 0.2,
+              top_p: 0.9
+            }, null, 2));
+            const response = await this.axiosInstance.post('/chat/completions', {
+              model,
+              messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: query }
+              ],
+              max_tokens: 1000,
+              temperature: 0.2,
+              top_p: 0.9
+            });
+            console.error('Got response:', response.data);
+
             return {
               content: [
                 {
@@ -299,9 +331,9 @@ class PerplexityServer {
               requirement: string;
               context?: string;
             };
-            const response = await this.axiosInstance.get(
-              `/search?q=API for ${requirement} ${context}`
-            );
+            const response = await this.axiosInstance.post('/search', {
+              query: `API for ${requirement} ${context}`
+            });
             return {
               content: [
                 {
@@ -317,9 +349,9 @@ class PerplexityServer {
               code: string;
               technology?: string;
             };
-            const response = await this.axiosInstance.get(
-              `/search?q=deprecated code ${code} ${technology}`
-            );
+            const response = await this.axiosInstance.post('/search', {
+              query: `deprecated code ${code} ${technology}`
+            });
             return {
               content: [
                 {
